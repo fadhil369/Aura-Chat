@@ -1,7 +1,7 @@
 {
-  "name": "secure-login-server",
+  "name": "aura-chat-server",
   "version": "1.0.0",
-  "description": "Backend for secure login demo",
+  "description": "Backend for Aura Chat - A premium messaging platform",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
