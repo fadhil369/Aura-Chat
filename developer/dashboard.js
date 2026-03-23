@@ -1,6 +1,5 @@
-// CHANGE THIS to your hosted Render URL (e.g., https://your-server.onrender.com)
-// Using your local IP for mobile access on same Wi-Fi.
-const API = 'http://192.168.1.126:3000';
+// YOUR LIVE PUBLIC RENDER SERVER!
+const API = 'https://aura-chat-r2hn.onrender.com';
 
 let refreshInterval;
 let countdown = 5;
