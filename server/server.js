@@ -165,9 +165,39 @@ app.get('/api/messages/:room', (req, res) => {
     res.json(messages[room] || []);
 });
 
+// Delete a specific message
+app.delete('/api/messages/:room/:id', (req, res) => {
+    const { room, id } = req.params;
+    if (messages[room]) {
+        const initialLength = messages[room].length;
+        messages[room] = messages[room].filter(m => m.id !== id);
+        if (messages[room].length < initialLength) {
+            saveMessages();
+            io.to(room).emit('message-deleted', { room, id });
+            return res.json({ success: true });
+        }
+    }
+    res.status(404).json({ error: 'Message not found' });
+});
+
 // ---------------------------
 // DEVELOPER DASHBOARD ENDPOINTS
 // ---------------------------
+
+// Remove a user
+app.delete('/api/admin/users/:chatId', (req, res) => {
+    const chatId = req.params.chatId;
+    const username = Object.keys(users).find(u => users[u].chatId === chatId);
+    
+    if (username) {
+        delete users[username];
+        saveUsers();
+        addLog('USER_REMOVED', username);
+        res.json({ success: true });
+    } else {
+        res.status(404).json({ error: 'User not found' });
+    }
+});
 
 // Get system logs and sanitized user list
 app.get('/api/admin/system-logs', (req, res) => {
@@ -204,7 +234,15 @@ io.on('connection', (socket) => {
 
     socket.on('send-message', (data) => {
         const { room, sender, senderChatId, text, target } = data;
-        const msg = { sender, senderChatId, text, timestamp: new Date() };
+        const now = new Date();
+        const msg = { 
+            id: Date.now().toString(), 
+            sender, 
+            senderChatId, 
+            text, 
+            timestamp: now,
+            time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
         
         if (!messages[room]) messages[room] = [];
         messages[room].push(msg);
@@ -216,6 +254,15 @@ io.on('connection', (socket) => {
         // Also emit to the target's personal room so they "discover" the message/sender
         if (target && target !== sender) {
             io.to(`user_${target}`).emit('receive-message', msg);
+        }
+    });
+
+    socket.on('delete-message', (data) => {
+        const { room, id } = data;
+        if (messages[room]) {
+            messages[room] = messages[room].filter(m => m.id !== id);
+            saveMessages();
+            io.to(room).emit('message-deleted', { room, id });
         }
     });
 

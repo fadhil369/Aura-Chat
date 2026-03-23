@@ -68,7 +68,8 @@ function logBadge(type) {
     const map = {
         LOGIN_SUCCESS: ['success', 'Login ✓'],
         LOGIN_FAILED:  ['failed', 'Failed ✗'],
-        REGISTER:      ['register', 'Register']
+        REGISTER:      ['register', 'Register'],
+        USER_REMOVED:  ['failed', 'Removed']
     };
     const [cls, label] = map[type] || ['register', type];
     return `<span class="log-badge badge-${cls}">${label}</span>`;
@@ -100,13 +101,30 @@ function renderUsers(users) {
     const rows = users.map(u => `
         <tr>
             <td><span class="user-avatar">${escHtml(u.username[0].toUpperCase())}</span>${escHtml(u.username)}</td>
+            <td><span class="chat-id-badge">${u.chatId}</span></td>
             <td class="hash-cell" title="${escHtml(u.passwordHash)}">${escHtml(u.passwordHash)}</td>
             <td>${new Date(u.createdAt).toLocaleString()}</td>
+            <td><button class="btn-remove" onclick="removeUser('${u.chatId}', '${escHtml(u.username)}')">Remove</button></td>
         </tr>`).join('');
     el.innerHTML = `<table class="users-table">
-        <thead><tr><th>Username</th><th>Password Hash (bcrypt)</th><th>Registered</th></tr></thead>
+        <thead><tr><th>Username</th><th>Chat ID</th><th>Password Hash</th><th>Registered</th><th>Action</th></tr></thead>
         <tbody>${rows}</tbody>
     </table>`;
+}
+
+async function removeUser(chatId, username) {
+    if (!confirm(`Are you sure you want to remove ${username}? Data will be lost forever.`)) return;
+    
+    try {
+        const res = await fetch(`${API}/api/admin/users/${chatId}`, { method: 'DELETE' });
+        if (res.ok) {
+            fetchData();
+        } else {
+            alert("Failed to remove user.");
+        }
+    } catch (err) {
+        alert("Server error.");
+    }
 }
 
 function escHtml(str) {

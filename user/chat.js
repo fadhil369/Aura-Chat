@@ -56,6 +56,20 @@ function initChat(userData) {
         }
     });
 
+    socket.on('message-deleted', (data) => {
+        const { room, id } = data;
+        
+        // Remove from UI
+        const el = document.getElementById(`msg-${id}`);
+        if (el) el.remove();
+
+        // Remove from localStorage
+        const localKey = `chat_history_${currentUser.username}_${room}`;
+        const localHistory = JSON.parse(localStorage.getItem(localKey) || '[]');
+        const updatedHistory = localHistory.filter(m => m.id !== id);
+        localStorage.setItem(localKey, JSON.stringify(updatedHistory));
+    });
+
     renderContacts();
 }
 
@@ -188,11 +202,37 @@ function sendMessage() {
     input.value = '';
 }
 
+function deleteMessage(msgId) {
+    if (!currentChatPartner) return;
+    const room = getRoomName(currentUser.username, currentChatPartner.username);
+    socket.emit('delete-message', { room, id: msgId });
+}
+
 function renderMessage(msg) {
     const container = document.getElementById('chat-messages');
+    
+    // Check if already rendered (to prevent duplicates on sync)
+    if (document.getElementById(`msg-${msg.id}`)) return;
+
     const div = document.createElement('div');
+    div.id = `msg-${msg.id}`;
     div.className = `message ${msg.sender === currentUser.username ? 'sent' : 'received'}`;
-    div.textContent = msg.text;
+    
+    const isSent = msg.sender === currentUser.username;
+    const timeStr = msg.time || new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    div.innerHTML = `
+        <div class="message-content">${msg.text}</div>
+        <div class="message-meta">
+            <span class="message-time">${timeStr}</span>
+            ${isSent ? `
+                <button class="btn-delete-msg" onclick="deleteMessage('${msg.id}')" title="Delete message">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                </button>
+            ` : ''}
+        </div>
+    `;
+    
     container.appendChild(div);
     container.scrollTop = container.scrollHeight;
 }

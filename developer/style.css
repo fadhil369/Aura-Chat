@@ -144,4 +144,19 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 .hash-cell { font-family: var(--mono); font-size: 0.75rem; color: var(--text-muted); max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .user-avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), #8b5cf6); display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; color: white; margin-right: 8px; vertical-align: middle; }
 
+.btn-remove {
+    background: rgba(248, 113, 113, 0.1);
+    color: var(--error);
+    border: 1px solid rgba(248, 113, 113, 0.2);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-remove:hover {
+    background: var(--error);
+    color: white;
+}
+
 .empty-state { color: var(--text-muted); font-size: 0.875rem; text-align: center; padding: 32px; }
