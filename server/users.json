@@ -1,0 +1,12 @@
+{
+  "fadhil": {
+    "passwordHash": "$2b$10$uMsIlDoMP6JIpH///PM8Kew4qNsuQwlsohpqAuOUcNZ0/puAm8XZS",
+    "createdAt": "2026-03-23T13:30:42.688Z",
+    "chatId": "5110149178"
+  },
+  "marjana": {
+    "passwordHash": "$2b$10$cW3lLsj9FtZccm2WJgkbSeiJ5hYeARCSIvwWGEKmcqv0XiXFZL0IS",
+    "chatId": "9254964084",
+    "createdAt": "2026-03-23T13:44:33.709Z"
+  }
+}
