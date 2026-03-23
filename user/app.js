@@ -1,6 +1,6 @@
 // CHANGE THIS to your hosted Render URL (e.g., https://your-server.onrender.com)
-// Leave it as 'http://localhost:3000' for local testing.
-const API = 'http://localhost:3000';
+// Using your local IP for mobile access on same Wi-Fi.
+const API = 'http://192.168.1.126:3000';
 let loggedInUser = null;
 
 
